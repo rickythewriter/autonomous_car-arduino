@@ -1,0 +1,89 @@
+int M1_A1 = 10; //Motor1 Control Input A1 to D10 . Right Motor .
+int M1_B1 = 11; //Motor1 Control Input B1 to D11 . Right Motor .
+int M2_B2 = 5; //Motor2 Control Input A2 to D5 . Left Motor . 
+int M2_A2 = 6; //Motor2 Control Input B2 to D6 . Left Motor. 
+#define sensorR 9
+#define sensorL 3 
+int valL = 0, valR = 0; 
+
+void setup()
+{
+  Serial.begin(9600); //Set serial baud rate to 9600 bps
+  pinMode(M1_A1, OUTPUT);
+  pinMode(sensorR, INPUT);
+  pinMode(sensorL, INPUT); 
+  pinMode(M1_B1 , OUTPUT);
+  pinMode(M2_A2, OUTPUT);
+  pinMode(M2_B2, OUTPUT);
+  stop(); 
+}
+
+void loop()
+{
+  R();
+  L();
+  if(valL == 1 && valR == 1) forward(); //inverted for white strips on wood floor 
+  else if(valL == 0 && valR == 1) Lmove();
+  else if(valL == 1 && valR == 0) Rmove();
+  else if(valL == 0 && valR == 0) stop(); 
+}
+
+void forward ()
+{
+  stop ();  // ensure control pins at 0,0 before changing
+   if(valL == 1 && valR == 1)
+  { 
+    Serial.println("Forward");  //used for debugging purposes   
+    analogWrite(M1_A1, LOW);
+    digitalWrite(M1_B1, 50);
+    analogWrite(M2_B2, LOW);
+    digitalWrite(M2_A2, 50);   
+  }
+}
+
+void Lmove()
+{
+  stop();
+  Serial.println("Turning Right");
+  if(valL == 0 && valR == 1)
+  {
+      analogWrite(M1_A1, LOW);
+      digitalWrite(M1_B1, 50);
+      analogWrite(M2_B2, LOW);
+      digitalWrite(M2_A2, 100);  
+  }
+}
+
+void Rmove()
+{ 
+  stop();
+  Serial.println("Moving Left"); 
+ if(valL == 1 && valR == 0)
+ {                      
+      analogWrite(M1_A1, LOW);
+      digitalWrite(M1_B1, 150);
+      analogWrite(M2_B2, LOW);
+      digitalWrite(M2_A2, 100);  
+ }
+}
+
+void stop()
+{
+    Serial.println("Stop");
+    digitalWrite(M1_A1, HIGH);
+    digitalWrite(M1_B1 , HIGH);
+    digitalWrite(M2_A2, HIGH);
+    digitalWrite(M2_B2 , HIGH); 
+}
+
+void R()
+{
+  valR = digitalRead(sensorR); 
+  Serial.println(valR); //Print the value to serial port
+}
+
+void L()
+{
+  valL = digitalRead(sensorL); 
+  Serial.println(valL); //Print the value to serial port
+}
